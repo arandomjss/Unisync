@@ -1,0 +1,67 @@
+# Node
+node_modules/
+.npm/
+.cache/
+
+# Build output
+.next/
+out/
+dist/
+build/
+.turbo/
+.parcel-cache/
+.eslintcache
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+Icon?
+.Trash-*
+.Spotlight-V100
+.fseventsd
+
+# Env
+.env*
+.envrc
+
+# Editors/IDEs
+.vscode/
+.idea/
+.history/
+.sublime*
+*.swp
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Testing/Storybook/Cypress
+.storybook/
+cypress/
+
+# Monorepo tools
+.nx/
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+
+# Local databases
+*.sqlite
+*.db
+*.local.db
+
+# Misc
+.editorconfig
+.prettier*
