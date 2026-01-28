@@ -1,7 +1,8 @@
 "use client"
 
 import GlassCard from '../components/GlassCard';
-import { CalendarDays, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
 const clubs = [
@@ -23,60 +24,41 @@ function getClubColor(clubName: string) {
 }
 
 export default function HeroCalendarMock() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showSidebar, setShowSidebar] = useState(true);
-
   // Generate a static month grid (Sun-Sat, 5 weeks)
   const days = Array.from({ length: 35 }, (_, i) => i - 2); // Start on Sun, Jan 28
   const startDate = new Date('2026-01-28');
   startDate.setDate(1 - startDate.getDay()); // Go to the previous Sunday
 
+  // Sidebar open state for both mobile and desktop
+  const [sidebarOpen, setSidebarOpen] = useState(true); // default open on desktop
+
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <CalendarDays className="w-8 h-8 text-indigo-400" />
-          <span className="text-2xl font-extrabold tracking-tight">UniSync</span>
-        </div>
-        {/* Desktop sidebar toggle */}
-        <button
-          className="hidden md:block p-2 rounded-full hover:bg-white/10 transition"
-          onClick={() => setShowSidebar((v) => !v)}
-        >
-          {showSidebar ? <X /> : <Menu />}
-        </button>
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden p-2 rounded-full hover:bg-white/10 transition"
-          onClick={() => setSidebarOpen(true)}
-        >
-          <Menu />
-        </button>
-      </header>
-      <div className="flex-1 flex w-full">
-        {/* Sidebar */}
-        {(showSidebar || sidebarOpen) && (
-          <aside
-            className={`fixed md:static z-30 top-0 left-0 h-full w-64 bg-zinc-900/80 backdrop-blur-md border-r border-white/10 p-6 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : 'md:translate-x-0 -translate-x-full md:translate-x-0'}`}
+      <div className="flex-1 w-full flex">
+        {/* Hamburger button for mobile, toggle button for desktop */}
+        {!sidebarOpen && (
+          <button
+            className="z-40 p-2 rounded-full bg-zinc-900/80 border border-white/10 hover:bg-white/10 transition shadow-lg"
+            style={{ position: 'fixed', top: 80, left: 8 }} // fixed for all screens
+            onClick={() => setSidebarOpen(true)}
           >
-            <div className="flex items-center justify-between mb-6">
-              <span className="font-bold text-lg">Clubs</span>
-              <button className="md:hidden p-1" onClick={() => setSidebarOpen(false)}><X /></button>
-            </div>
-            <ul className="space-y-3">
-              {clubs.map((club) => (
-                <li key={club.name} className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${club.color}`}></span>
-                  <span className="text-zinc-100">{club.name}</span>
-                </li>
-              ))}
-            </ul>
-          </aside>
+            <span className="sr-only">Open sidebar</span>
+            <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-menu"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
         )}
+        <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
         {/* Main calendar area */}
-        <main className="flex-1 flex flex-col items-center justify-start p-6 md:ml-0 ml-0">
-          <GlassCard className="w-full max-w-4xl">
+        <main
+          className={
+            `flex-1 flex flex-col items-center justify-start p-2 sm:p-4 md:p-8 max-w-full transition-all duration-300 ` +
+            (
+              sidebarOpen
+                ? 'md:ml-56' // Sidebar open: offset on desktop
+                : 'md:ml-56 md:justify-start' // Sidebar closed: offset on desktop, center on mobile
+            )
+          }
+        >
+          <GlassCard className="w-full max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <button className="p-2 rounded-full hover:bg-white/10 transition"><ChevronLeft /></button>
               <span className="font-semibold text-lg">January 2026</span>
