@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -13,6 +13,13 @@ interface LoginModalProps {
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const [isLogin, setIsLogin] = useState(true);
+    useEffect(() => {
+        if (isOpen) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+    }, [isOpen]);
 
     return (
         <AnimatePresence>
@@ -26,12 +33,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                         className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
                     />
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 z-50"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="fixed inset-0 flex items-center justify-center w-full h-full z-50"
                     >
-                        <div className="glass-card rounded-2xl p-8 relative overflow-hidden">
+                        <div className="glass-card rounded-2xl p-8 relative overflow-hidden max-w-md w-full mx-auto">
                             {/* Decorative glow */}
                             <div className="absolute -top-20 -right-20 w-40 h-40 bg-neon-purple/30 rounded-full blur-3xl pointer-events-none" />
                             <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-neon-blue/30 rounded-full blur-3xl pointer-events-none" />

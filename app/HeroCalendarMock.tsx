@@ -17,6 +17,22 @@ const mockEvents = [
   { date: '2026-01-29', title: 'Tech Talk', club: 'IEEE Club' },
   { date: '2026-01-30', title: 'Art Expo', club: 'ASDD Club' },
   { date: '2026-01-31', title: 'Chess Tournament', club: 'ACH Club' },
+  { date: '2026-01-28', title: 'Poetry Slam', club: 'ASDD Club' },
+  { date: '2026-01-29', title: 'Robotics Demo', club: 'IEEE Club' },
+  { date: '2026-01-30', title: 'Cultural Parade', club: 'Cultural Club' },
+  { date: '2026-01-31', title: 'Math Olympiad', club: 'ACH Club' },
+  { date: '2026-02-01', title: 'Music Fest', club: 'Cultural Club' },
+  { date: '2026-02-02', title: 'Code Sprint', club: 'IEEE Club' },
+  { date: '2026-02-03', title: 'Painting Workshop', club: 'ASDD Club' },
+  { date: '2026-02-04', title: 'Debate Competition', club: 'ACH Club' },
+  { date: '2026-02-05', title: 'Drama Night', club: 'Cultural Club' },
+  { date: '2026-02-06', title: 'AI Seminar', club: 'IEEE Club' },
+  { date: '2026-02-07', title: 'Photography Walk', club: 'ASDD Club' },
+  { date: '2026-02-08', title: 'Science Fair', club: 'ACH Club' },
+  { date: '2026-02-09', title: 'Fashion Show', club: 'Cultural Club' },
+  { date: '2026-02-10', title: 'Circuit Design', club: 'IEEE Club' },
+  { date: '2026-02-11', title: 'Sculpture Class', club: 'ASDD Club' },
+  { date: '2026-02-12', title: 'Quiz Bowl', club: 'ACH Club' },
 ];
 
 function getClubColor(clubName: string) {
