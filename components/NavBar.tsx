@@ -12,6 +12,10 @@ const navItems = [
   { name: "Explore", href: "/explore", icon: Compass },
   { name: "Events", href: "/events", icon: Calendar },
   { name: "Profile", href: "/profile", icon: User },
+  { name: "Admin Dashboard", href: "/admin", icon: Compass },
+  { name: "Manage Events", href: "/admin/events", icon: Calendar },
+  { name: "Club Dashboard", href: "/club/dashboard", icon: User },
+  { name: "Your Events", href: "/club/events", icon: Calendar },
 ];
 
 export default function NavBar() {
@@ -39,11 +43,11 @@ export default function NavBar() {
                 {isActive && (
                   <motion.div
                     layoutId="desktop-nav"
-                    className="absolute inset-0 bg-black/10 dark:bg-white/10 rounded-full -z-10"
+                    className="absolute inset-0 bg-neon-blue/30 dark:bg-white/20 rounded-full -z-10"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-                {item.name}
+                <span className={cn(isActive ? "text-black dark:text-white" : "text-zinc-600 dark:text-zinc-400")}>{item.name}</span>
               </Link>
             );
           })}

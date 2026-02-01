@@ -40,8 +40,8 @@ export default function ProfilePage() {
   const [bio, setBio] = useState(mockUser.bio);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 flex flex-col items-center py-12 px-2 mt-24">
-      <GlassCard className="w-full max-w-4xl mx-auto p-0 overflow-visible">
+    <div className="min-h-screen bg-background flex flex-col items-center py-12 px-2 mt-24">
+      <GlassCard className="w-full max-w-4xl mx-auto p-0 overflow-visible glass-card text-zinc-800 dark:text-zinc-300">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 p-8 pb-4">
           {/* Avatar Placeholder */}
@@ -51,7 +51,7 @@ export default function ProfilePage() {
           {/* Info */}
           <div className="flex-1 flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <h2 className="text-3xl font-bold text-white flex items-center gap-2">
+              <h2 className="text-3xl font-bold text-zinc-800 dark:text-white flex items-center gap-2">
                 {mockUser.name}
                 {mockUser.verified && <BadgeCheck className="text-neon-blue" size={22} />}
               </h2>
@@ -68,11 +68,11 @@ export default function ProfilePage() {
               <Input
                 value={bio}
                 onChange={e => setBio(e.target.value)}
-                className="mt-2"
+                className="mt-2 bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
                 maxLength={120}
               />
             ) : (
-              <p className="mt-2 text-zinc-300">{bio}</p>
+              <p className="mt-2 text-zinc-600 dark:text-zinc-300">{bio}</p>
             )}
             <div className="flex flex-wrap gap-2 mt-2">
               {mockUser.interests.map((interest) => (
@@ -89,22 +89,22 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 pt-0">
           {/* Clubs */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2"><Users size={18} />Clubs</h3>
+            <h3 className="text-lg font-bold text-zinc-700 dark:text-white mb-2 flex items-center gap-2"><Users size={18} />Clubs</h3>
             <ul className="space-y-2">
               {mockUser.clubs.map((club) => (
                 <li key={club.name} className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${club.color}`}></span>
-                  <span className="text-zinc-100 text-sm">{club.name}</span>
+                  <span className="text-zinc-700 dark:text-zinc-100 text-sm">{club.name}</span>
                 </li>
               ))}
             </ul>
           </div>
           {/* Achievements */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2"><Star size={18} />Achievements</h3>
+            <h3 className="text-lg font-bold text-zinc-700 dark:text-white mb-2 flex items-center gap-2"><Star size={18} />Achievements</h3>
             <ul className="space-y-2">
               {mockUser.achievements.map((ach, i) => (
-                <li key={i} className="flex items-center gap-2 text-zinc-100 text-sm">
+                <li key={i} className="flex items-center gap-2 text-zinc-700 dark:text-zinc-100 text-sm">
                   {ach.icon}
                   {ach.label}
                 </li>
@@ -113,10 +113,10 @@ export default function ProfilePage() {
           </div>
           {/* Upcoming Events */}
           <div>
-            <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2"><Calendar size={18} />Upcoming Events</h3>
+            <h3 className="text-lg font-bold text-zinc-700 dark:text-white mb-2 flex items-center gap-2"><Calendar size={18} />Upcoming Events</h3>
             <ul className="space-y-2">
               {mockUser.upcomingEvents.map((event, i) => (
-                <li key={i} className="flex flex-col gap-1 bg-white/5 rounded-lg p-2 border border-white/10">
+                <li key={i} className="flex flex-col gap-1 glass rounded-lg p-2">
                   <span className="font-semibold text-neon-blue text-sm">{event.title}</span>
                   <span className="text-xs text-zinc-400">{event.date} • {event.club}</span>
                 </li>
@@ -126,10 +126,10 @@ export default function ProfilePage() {
         </div>
         {/* Past Events */}
         <div className="p-8 pt-0">
-          <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2"><Calendar size={18} />Past Events</h3>
+          <h3 className="text-lg font-bold text-zinc-700 dark:text-white mb-2 flex items-center gap-2"><Calendar size={18} />Past Events</h3>
           <div className="flex flex-wrap gap-4">
             {mockUser.pastEvents.map((event, i) => (
-              <div key={i} className="bg-white/5 rounded-lg p-3 border border-white/10 min-w-[180px]">
+              <div key={i} className="glass rounded-lg p-3 min-w-[180px]">
                 <span className="font-semibold text-neon-purple text-sm">{event.title}</span>
                 <div className="text-xs text-zinc-400">{event.date} • {event.club}</div>
               </div>

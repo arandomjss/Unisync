@@ -74,7 +74,7 @@ export default function Home() {
         <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-background to-transparent z-10" />
 
         <div className="flex w-full overflow-hidden whitespace-nowrap">
-          <div className="animate-ticker flex items-center gap-12 text-zinc-400 dark:text-zinc-600 font-bold text-4xl uppercase tracking-widest opacity-30 select-none">
+          <div className="animate-ticker flex items-center gap-12 text-zinc-500 dark:text-zinc-500 font-bold text-4xl uppercase tracking-widest opacity-30 select-none">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex gap-12">
                 <span>Hackathons</span> <span className="text-neon-blue">●</span>
