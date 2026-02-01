@@ -2,45 +2,6 @@
 
 Unisync is a Next.js application designed to provide a seamless user experience with modern web technologies. This project uses Tailwind CSS for styling and TypeScript for type safety.
 
-## Project Structure
-
-```
-next-env.d.ts
-next.config.mjs
-package.json
-postcss.config.js
-tailwind.config.js
-tsconfig.json
-app/
-  globals.css
-  HeroCalendarMock.tsx
-  layout.tsx
-  page.tsx
-  dashboard/
-    page.tsx
-  events/
-    page.tsx
-  explore/
-    page.tsx
-  profile/
-    page.tsx
-components/
-  Footer.tsx
-  GlassCard.tsx
-  LoginModal.tsx
-  NavBar.tsx
-  Sidebar.tsx
-  ThemeProvider.tsx
-  ui/
-    Button.tsx
-    Card.tsx
-    Input.tsx
-    ThemeToggle.tsx
-lib/
-  data.ts
-  utils.ts
-```
-
 ## Prerequisites
 
 - **Node.js**: Ensure you have Node.js installed on your system. You can download it from [Node.js](https://nodejs.org/).
