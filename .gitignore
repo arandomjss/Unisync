@@ -62,6 +62,10 @@ cypress/
 *.db
 *.local.db
 
+# Ignore SQL files for mock data and schema
+supabase_mock_data_and_queries.sql
+supabase_schema.sql
+
 # Misc
 .editorconfig
-.prettier*
+.prettier

@@ -138,7 +138,7 @@ export default function ProfilePage() {
         </div>
         {/* Actions */}
         <div className="flex justify-end gap-2 p-4 pt-0">
-          <Button variant="outline" className="border-white/10 text-zinc-400 hover:text-white"><LogOut size={16} className="mr-2" />Logout</Button>
+          <Button variant="ghost" className="border-white/10 text-zinc-400 hover:text-white"><LogOut size={16} className="mr-2" />Logout</Button>
           <Button variant="neon" className="font-bold"><Sparkles size={16} className="mr-2" />Upgrade</Button>
         </div>
       </GlassCard>
