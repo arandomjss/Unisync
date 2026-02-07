@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --input-light: 214.3 31.8% 91.4%;
+  --input-dark: 217.2 32.6% 17.5%;
+}
+
+[data-theme="light"] {
+  --input: var(--input-light);
+}
+
+[data-theme="dark"] {
+  --input: var(--input-dark);
+}
+
 @layer base {
   :root {
     --background: 210 40% 98%;
@@ -98,4 +111,12 @@
 
 .text-gradient {
   @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-neon-blue dark:via-neon-purple dark:to-neon-pink;
+}
+
+/* Ensure proper application of Tailwind classes */
+.bg-input {
+  background-color: hsl(var(--input));
+}
+.text-input {
+  color: hsl(var(--input));
 }

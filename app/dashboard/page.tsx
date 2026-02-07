@@ -75,7 +75,7 @@ export default function DashboardPage() {
                         <span className="text-red-500 font-bold tracking-wider text-xs uppercase">Live Now</span>
                     </div>
 
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544197150-b99a580bbcbf?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-[url('/images/placeholder.jpg')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
                     <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full">

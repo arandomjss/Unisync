@@ -2,9 +2,13 @@
 
 import React from "react";
 
-export default function EventTable() {
+interface EventTableProps {
+  className?: string; // Allow custom class names
+}
+
+export default function EventTable({ className }: EventTableProps) {
   return (
-    <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md">
+    <div className={`${className} bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md`}>
       <table className="w-full text-left">
         <thead>
           <tr className="border-b border-zinc-200 dark:border-zinc-700">
