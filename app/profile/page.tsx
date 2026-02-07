@@ -11,6 +11,23 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [bio, setBio] = useState("No bio available.");
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        console.error("User is not logged in. Redirecting to landing page.");
+        window.location.href = "/"; // Redirect to landing page
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -49,12 +66,38 @@ export default function ProfilePage() {
         if (data && data.length > 0) {
           setUser(data[0]);
           setBio(data[0].bio || "No bio available.");
+          setName(data[0].name || "New User");
         }
       }
     };
 
     fetchUserData();
   }, []);
+
+  const updateProfile = async () => {
+    const { error } = await supabase
+      .from('users')
+      .update({ name, bio })
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('Error updating profile:', error);
+    } else {
+      console.log('Profile updated successfully');
+      setEditMode(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Error logging out:', error);
+    } else {
+      console.log('User logged out successfully');
+      window.location.href = '/'; // Redirect to the landing page
+    }
+  };
 
   if (!user) {
     return (
@@ -84,11 +127,11 @@ export default function ProfilePage() {
           </div>
           {/* Info */}
           <div className="flex-1 flex flex-col gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
               <h2 className="text-3xl font-bold text-zinc-800 dark:text-white flex items-center gap-2">
                 {user.name}
               </h2>
-              <Button size="icon" variant="ghost" className="ml-2" onClick={() => setEditMode((v) => !v)}>
+              <Button size="icon" variant="ghost" onClick={() => setEditMode((v) => !v)}>
                 <Edit2 size={18} />
               </Button>
             </div>
@@ -97,14 +140,29 @@ export default function ProfilePage() {
               <span className="flex items-center gap-1"><User size={16} /> {user.role}</span>
             </div>
             {editMode ? (
-              <Input
-                value={bio}
-                onChange={e => setBio(e.target.value)}
-                className="mt-2 bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white"
-                maxLength={120}
-              />
+              <>
+                <Input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  className="mt-2 bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white rounded-lg p-2 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-neon-blue"
+                  placeholder="Enter your name"
+                  maxLength={50}
+                />
+                <Input
+                  value={bio}
+                  onChange={e => setBio(e.target.value)}
+                  className="mt-2 bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-white rounded-lg p-2 border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-neon-blue"
+                  placeholder="Enter your bio"
+                  maxLength={120}
+                />
+                <Button onClick={updateProfile} className="mt-4 bg-neon-blue text-white px-4 py-2 rounded-lg hover:bg-neon-blue-dark transition-all">
+                  Save Changes
+                </Button>
+              </>
             ) : (
-              <p className="mt-2 text-zinc-600 dark:text-zinc-300">{bio}</p>
+              <>
+                <p className="mt-2 text-zinc-600 dark:text-zinc-300">{bio}</p>
+              </>
             )}
             <div className="flex flex-wrap gap-2 mt-2">
               {user.interests?.map((interest) => (
@@ -170,7 +228,9 @@ export default function ProfilePage() {
         </div>
         {/* Actions */}
         <div className="flex justify-end gap-2 p-4 pt-0">
-          <Button variant="ghost" className="border-white/10 text-zinc-400 hover:text-white"><LogOut size={16} className="mr-2" />Logout</Button>
+          <Button variant="ghost" className="border-white/10 text-zinc-400 hover:text-white" onClick={handleLogout}>
+            <LogOut size={16} className="mr-2" />Logout
+          </Button>
           <Button variant="neon" className="font-bold"><Sparkles size={16} className="mr-2" />Upgrade</Button>
         </div>
       </GlassCard>

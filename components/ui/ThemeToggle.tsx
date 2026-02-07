@@ -6,11 +6,20 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/Button";
 
 export function ThemeToggle() {
+    const [mounted, setMounted] = React.useState(false);
     const { theme, setTheme } = useTheme();
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const toggleTheme = () => {
         setTheme(theme === "dark" ? "light" : "dark");
     };
+
+    if (!mounted) {
+        return null; // Prevent rendering until the component is mounted
+    }
 
     return (
         <Button
