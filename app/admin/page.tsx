@@ -1,3 +1,5 @@
+"use client";
+
 import GlassCard from "@/components/GlassCard";
 import EventTable from "@/components/admin/EventTable";
 import { useEffect } from "react";

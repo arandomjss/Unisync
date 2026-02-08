@@ -6,7 +6,7 @@ import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Sparkles, User, Edit2, LogOut, Star, Calendar, Users, Mail, ShieldCheck, BadgeCheck } from "lucide-react";
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from "@/lib/supabaseClient";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -20,15 +20,17 @@ export default function ProfilePage() {
     const checkAuth = async () => {
       const {
         data: { session },
+        error: sessionError,
       } = await supabase.auth.getSession();
 
-      if (!session) {
-        router.push("/");
+      if (sessionError || !session) {
+        console.error("User is not logged in. Redirecting to landing page.");
+        window.location.href = "/"; // Redirect to landing page
       }
     };
 
     checkAuth();
-  }, [router]);
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
