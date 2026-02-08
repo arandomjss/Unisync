@@ -1,12 +1,46 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+
+interface Event {
+  id: string;
+  title: string;
+  club_name: string;
+  date: string;
+}
 
 interface EventTableProps {
   className?: string; // Allow custom class names
 }
 
 export default function EventTable({ className }: EventTableProps) {
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    async function fetchEvents() {
+      const { data, error } = await supabase
+        .from("events")
+        .select("id, title, date, clubs!inner(name)")
+        .eq("status", "pending")
+        .order("date", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching events:", error);
+      } else {
+        const formattedEvents = data.map((event) => ({
+          id: event.id,
+          title: event.title,
+          club_name: Array.isArray(event.clubs) ? event.clubs[0]?.name : event.clubs?.name || "Unknown Club", // Handle both array and object cases
+          date: event.date,
+        }));
+        setEvents(formattedEvents);
+      }
+    }
+
+    fetchEvents();
+  }, []);
+
   return (
     <div className={`${className} bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md`}>
       <table className="w-full text-left">
@@ -19,24 +53,17 @@ export default function EventTable({ className }: EventTableProps) {
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b border-zinc-200 dark:border-zinc-700">
-            <td className="py-2 px-4 text-zinc-800 dark:text-white">Hackathon</td>
-            <td className="py-2 px-4 text-zinc-800 dark:text-white">IEEE Club</td>
-            <td className="py-2 px-4 text-zinc-800 dark:text-white">2026-02-15</td>
-            <td className="py-2 px-4">
-              <button className="text-green-500 hover:underline mr-2">Approve</button>
-              <button className="text-red-500 hover:underline">Reject</button>
-            </td>
-          </tr>
-          <tr>
-            <td className="py-2 px-4 text-zinc-800 dark:text-white">Workshop</td>
-            <td className="py-2 px-4 text-zinc-800 dark:text-white">ASDD Club</td>
-            <td className="py-2 px-4 text-zinc-800 dark:text-white">2026-02-20</td>
-            <td className="py-2 px-4">
-              <button className="text-green-500 hover:underline mr-2">Approve</button>
-              <button className="text-red-500 hover:underline">Reject</button>
-            </td>
-          </tr>
+          {events.map((event) => (
+            <tr key={event.id} className="border-b border-zinc-200 dark:border-zinc-700">
+              <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.title}</td>
+              <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.club_name}</td>
+              <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.date}</td>
+              <td className="py-2 px-4">
+                <button className="text-green-500 hover:underline mr-2">Approve</button>
+                <button className="text-red-500 hover:underline">Reject</button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

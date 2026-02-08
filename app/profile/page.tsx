@@ -68,9 +68,7 @@ export default function ProfilePage() {
       if (error) {
         console.error('Error fetching user data:', error);
       } else {
-        console.log('Fetched user data:', data); // Debugging log for fetched user data
         if (data && data.length > 0) {
-          console.log('Fetched clubs data:', data[0].clubs); // Debugging log for clubs data
           setUser(data[0]);
           setBio(data[0].bio || "No bio available.");
           setName(data[0].name || "New User");

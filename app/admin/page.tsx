@@ -2,12 +2,17 @@
 
 import GlassCard from "@/components/GlassCard";
 import EventTable from "@/components/admin/EventTable";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const [stats, setStats] = useState({
+    totalEvents: 0,
+    activeClubs: 0,
+    pendingApprovals: 0,
+  });
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -20,7 +25,22 @@ export default function AdminDashboard() {
       }
     };
 
+    const fetchStats = async () => {
+      const [{ data: events }, { data: clubs }, { data: pendingEvents }] = await Promise.all([
+        supabase.from("events").select("id"),
+        supabase.from("clubs").select("id"),
+        supabase.from("events").select("id").eq("status", "pending"),
+      ]);
+
+      setStats({
+        totalEvents: events?.length || 0,
+        activeClubs: clubs?.length || 0,
+        pendingApprovals: pendingEvents?.length || 0,
+      });
+    };
+
     checkAuth();
+    fetchStats();
   }, [router]);
 
   return (
@@ -31,23 +51,25 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <GlassCard className="p-6 glass-card">
           <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">Total Events</h2>
-          <p className="text-3xl font-bold text-neon-blue">42</p>
+          <p className="text-3xl font-bold text-neon-blue">{stats.totalEvents}</p>
         </GlassCard>
         <GlassCard className="p-6 glass-card">
           <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">Active Clubs</h2>
-          <p className="text-3xl font-bold text-neon-purple">12</p>
+          <p className="text-3xl font-bold text-neon-purple">{stats.activeClubs}</p>
         </GlassCard>
         <GlassCard className="p-6 glass-card">
           <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">Pending Approvals</h2>
-          <p className="text-3xl font-bold text-neon-yellow">5</p>
+          <p className="text-3xl font-bold text-neon-yellow">{stats.pendingApprovals}</p>
         </GlassCard>
       </div>
 
       {/* Event Management Section */}
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-zinc-800 dark:text-white mb-4">Pending Events</h2>
-        <EventTable className="glass-card" />
-      </div>
+      {stats.pendingApprovals > 0 && (
+        <div className="mt-10">
+          <h2 className="text-2xl font-bold text-zinc-800 dark:text-white mb-4">Pending Events</h2>
+          <EventTable className="glass-card" />
+        </div>
+      )}
 
       {/* Placeholder for Club Management */}
       <div className="mt-10">
