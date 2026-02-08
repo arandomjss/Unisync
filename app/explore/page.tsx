@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { Heart, MessageCircle, Share2, MapPin, Calendar, Music, Code, Palette, Coffee } from "lucide-react";
+import { Heart, MessageCircle, Share2, MapPin, Calendar, Music, Code, Palette, Coffee, Clock, GaugeCircle } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -34,7 +34,7 @@ export default function ExplorePage() {
         const fetchEvents = async () => {
             const { data, error } = await supabase
                 .from("events")
-                .select("id, title, description, date, club_id, created_at, clubs(name)")
+                .select("id, title, description, date, club_id, created_at, time, location, capacity, clubs(name)")
                 .eq("status", "approved");
 
             if (error) {
@@ -94,7 +94,15 @@ export default function ExplorePage() {
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <MapPin size={16} className="text-neon-green" />
-                                    Location Placeholder
+                                    {event.location || "Location not specified"}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <Clock size={16} className="text-neon-blue" />
+                                    {event.time || "Time not specified"}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <GaugeCircle size={16} className="text-neon-pink" />
+                                    {event.capacity ? `${event.capacity} seats` : "Capacity not specified"}
                                 </div>
                             </div>
 

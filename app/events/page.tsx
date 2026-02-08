@@ -38,7 +38,7 @@ export default function EventsPage() {
         const fetchEvents = async () => {
             const { data, error } = await supabase
                 .from('events')
-                .select('id, title, description, date, status, club_id');
+                .select('id, title, description, date, status, club_id, time, location, capacity');
 
             if (error) {
                 console.error('Error fetching events:', error);
@@ -50,6 +50,9 @@ export default function EventsPage() {
                     date: new Date(event.date), // Convert date string to Date object
                     status: event.status,
                     clubId: event.club_id, // Map club_id to clubId for consistency
+                    time: event.time || 'Time not specified',
+                    location: event.location || 'Location not specified',
+                    capacity: event.capacity ? `${event.capacity}` : 'Capacity not specified', // Removed repetition of 'seats'
                 }));
                 setEvents(processedEvents);
             }
@@ -81,11 +84,6 @@ export default function EventsPage() {
 
         fetchClubs();
     }, []);
-
-    useEffect(() => {
-        console.log('Fetched events:', events); // Debugging log for events
-        console.log('Selected clubs:', selectedClubs); // Debugging log for selected clubs
-    }, [events, selectedClubs]);
 
     useEffect(() => {
         if (clubs.length > 0) {
@@ -273,8 +271,9 @@ export default function EventsPage() {
                                                 <p className="text-sm text-zinc-500 mb-3 line-clamp-2">{event.description}</p>
 
                                                 <div className="flex items-center gap-4 text-sm text-zinc-500">
-                                                    <span className="flex items-center gap-1"><Clock size={14} /> {format(event.date, 'p')}</span>
-                                                    <span className="flex items-center gap-1"><MapPin size={14} /> {event.location}</span>
+                                                    <span className="flex items-center gap-1"><Clock size={14} /> {event.time || 'Time not specified'}</span>
+                                                    <span className="flex items-center gap-1"><MapPin size={14} /> {event.location || 'Location not specified'}</span>
+                                                    <span className="flex items-center gap-1"><FaRegCircle size={14} /> {event.capacity ? `${event.capacity}` : 'Capacity not specified'}</span>
                                                 </div>
                                             </div>
 
