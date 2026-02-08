@@ -55,7 +55,10 @@ export default function ProfilePage() {
         .from('users')
         .select(`
           *,
-          clubs:club_memberships (club:clubs (*)),
+          clubs:club_memberships (
+            role,
+            club:clubs (*)
+          ),
           achievements (*),
           upcomingEvents:event_participants (event:events!event_id_fkey (*)),
           pastEvents:event_participants (event:events!event_id_fkey (*))
@@ -65,8 +68,9 @@ export default function ProfilePage() {
       if (error) {
         console.error('Error fetching user data:', error);
       } else {
-        console.log('Fetched data:', data);
+        console.log('Fetched user data:', data); // Debugging log for fetched user data
         if (data && data.length > 0) {
+          console.log('Fetched clubs data:', data[0].clubs); // Debugging log for clubs data
           setUser(data[0]);
           setBio(data[0].bio || "No bio available.");
           setName(data[0].name || "New User");
@@ -184,10 +188,12 @@ export default function ProfilePage() {
           <div>
             <h3 className="text-lg font-bold text-zinc-700 dark:text-white mb-2 flex items-center gap-2"><Users size={18} />Clubs</h3>
             <ul className="space-y-2">
-              {user.clubs?.map((club) => (
-                <li key={`${club.id}-${club.name}`} className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${club.color}`}></span>
-                  <span className="text-zinc-700 dark:text-zinc-100 text-sm">{club.name}</span>
+              {user.clubs?.map(({ club, role }) => (
+                <li key={club.id} className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full bg-gray-500`}></span> {/* Placeholder color */}
+                  <span className="text-zinc-700 dark:text-zinc-100 text-sm">
+                    {club.name} ({role})
+                  </span>
                 </li>
               ))}
             </ul>

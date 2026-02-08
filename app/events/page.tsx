@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { clubs, events, type Event, type Club } from "@/lib/data";
+import { clubs, type Event, type Club } from "@/lib/data";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ChevronLeft, ChevronRight, MapPin, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { FaRegCircle } from "react-icons/fa"; // Importing a default icon from react-icons
 
 export default function EventsPage() {
     const router = useRouter();
@@ -28,9 +29,72 @@ export default function EventsPage() {
         checkAuth();
     }, [router]);
 
+    const [events, setEvents] = useState<Event[]>([]); // Initialize events state
+    const [selectedClubs, setSelectedClubs] = useState<string[]>([]); // Initialize selectedClubs as an empty array
+
+    const [clubs, setClubs] = useState([]); // Initialize clubs state
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const { data, error } = await supabase
+                .from('events')
+                .select('id, title, description, date, status, club_id');
+
+            if (error) {
+                console.error('Error fetching events:', error);
+            } else {
+                const processedEvents = (data || []).map(event => ({
+                    id: event.id,
+                    title: event.title,
+                    description: event.description,
+                    date: new Date(event.date), // Convert date string to Date object
+                    status: event.status,
+                    clubId: event.club_id, // Map club_id to clubId for consistency
+                }));
+                setEvents(processedEvents);
+            }
+        };
+
+        fetchEvents();
+    }, []);
+
+    useEffect(() => {
+        const fetchClubs = async () => {
+            const { data, error } = await supabase
+                .from('clubs')
+                .select('id, name, description');
+
+            if (error) {
+                console.error('Error fetching clubs:', error);
+            } else {
+                const processedClubs = (data || []).map(club => ({
+                    id: club.id,
+                    name: club.name,
+                    description: club.description,
+                    icon: getClubIcon(club.id), // Map club ID to icon
+                    color: getClubColor(club.id), // Map club ID to color
+                    textColor: getClubTextColor(club.id), // Map club ID to text color
+                }));
+                setClubs(processedClubs);
+            }
+        };
+
+        fetchClubs();
+    }, []);
+
+    useEffect(() => {
+        console.log('Fetched events:', events); // Debugging log for events
+        console.log('Selected clubs:', selectedClubs); // Debugging log for selected clubs
+    }, [events, selectedClubs]);
+
+    useEffect(() => {
+        if (clubs.length > 0) {
+            setSelectedClubs(clubs.map(c => c.id)); // Update selectedClubs after clubs are fetched
+        }
+    }, [clubs]);
+
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [selectedClubs, setSelectedClubs] = useState<string[]>(clubs.map(c => c.id));
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
@@ -75,7 +139,7 @@ export default function EventsPage() {
 
                     <div className="flex flex-wrap md:flex-col gap-2">
                         {clubs.map(club => {
-                            const Icon = club.icon;
+                            const Icon = getClubIcon(club.id);
                             const isSelected = selectedClubs.includes(club.id);
                             return (
                                 <button
@@ -153,12 +217,15 @@ export default function EventsPage() {
                                                 return (
                                                     <div
                                                         key={event.id}
-                                                        className={cn("w-2 h-2 rounded-full", club?.textColor.replace('text-', 'bg-'))}
-                                                    />
+                                                        className="flex items-center gap-1"
+                                                    >
+                                                        {club?.icon && <club.icon className="w-4 h-4" />}
+                                                        <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{club?.name}</span>
+                                                    </div>
                                                 );
                                             })}
                                             {dayEvents.length > 4 && (
-                                                <span className="text-[10px] text-zinc-500">+</span>
+                                                <span className="text-[10px] text-zinc-500">+{dayEvents.length - 4} more</span>
                                             )}
                                         </div>
                                     </div>
@@ -226,3 +293,40 @@ export default function EventsPage() {
         </div>
     );
 }
+
+// Helper functions to map club properties
+const getClubIcon = (clubId) => {
+    const icons = {
+        '09b9cf73-a10c-4711-b27e-4096e9f0c837': FaRegCircle,
+        '3f2c1e6d-3517-42d2-a36a-f206ea79726f': FaRegCircle,
+        '61127212-e8de-4c35-ae18-b7850b01375e': FaRegCircle,
+        'f2bc2c06-7cbb-4796-8439-39363811aaa6': FaRegCircle,
+        '6ba1c130-ee8a-4197-9c1f-384f81cdb575': FaRegCircle,
+        '0df6c4b8-2cbd-4e5a-b474-b778638340c5': FaRegCircle,
+    };
+    return icons[clubId] || FaRegCircle; // Use FaRegCircle as the default icon
+};
+
+const getClubColor = (clubId) => {
+    const colors = {
+        '09b9cf73-a10c-4711-b27e-4096e9f0c837': 'bg-red-500',
+        '3f2c1e6d-3517-42d2-a36a-f206ea79726f': 'bg-green-500',
+        '61127212-e8de-4c35-ae18-b7850b01375e': 'bg-blue-500',
+        'f2bc2c06-7cbb-4796-8439-39363811aaa6': 'bg-pink-500',
+        '6ba1c130-ee8a-4197-9c1f-384f81cdb575': 'bg-teal-500',
+        '0df6c4b8-2cbd-4e5a-b474-b778638340c5': 'bg-yellow-500',
+    };
+    return colors[clubId] || 'bg-gray-500';
+};
+
+const getClubTextColor = (clubId) => {
+    const textColors = {
+        '09b9cf73-a10c-4711-b27e-4096e9f0c837': 'text-white',
+        '3f2c1e6d-3517-42d2-a36a-f206ea79726f': 'text-black',
+        '61127212-e8de-4c35-ae18-b7850b01375e': 'text-white',
+        'f2bc2c06-7cbb-4796-8439-39363811aaa6': 'text-white',
+        '6ba1c130-ee8a-4197-9c1f-384f81cdb575': 'text-black',
+        '0df6c4b8-2cbd-4e5a-b474-b778638340c5': 'text-black',
+    };
+    return textColors[clubId] || 'text-black';
+};
