@@ -4,7 +4,11 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
-export default function EventSubmissionForm() {
+interface EventSubmissionFormProps {
+  className?: string; // Allow custom class names
+}
+
+export default function EventSubmissionForm({ className }: EventSubmissionFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
@@ -17,7 +21,10 @@ export default function EventSubmissionForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className={`${className} space-y-4 bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-md`}
+    >
       <h2 className="text-2xl font-bold text-zinc-800 dark:text-white">Submit New Event</h2>
       <Input
         type="text"

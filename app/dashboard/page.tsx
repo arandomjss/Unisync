@@ -5,6 +5,50 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/Button";
 import { Calendar, MapPin, Users, Heart, ArrowUpRight, Play, Ticket, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from '@/lib/supabaseClient';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+async function fetchUserName() {
+    const {
+        data: { session },
+        error: sessionError,
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+        console.error("User is not logged in.");
+        return "Guest";
+    }
+
+    const userId = session.user.id;
+
+    const { data, error } = await supabase
+        .from('users')
+        .select('name')
+        .eq('id', userId)
+        .single();
+
+    if (error) {
+        console.error('Error fetching user name:', error);
+        return "Guest";
+    }
+
+    return data.name || "Guest";
+}
+
+async function fetchEvents() {
+    const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('date', { ascending: true });
+
+    if (error) {
+        console.error('Error fetching events:', error);
+        return [];
+    }
+
+    return data;
+}
 
 const BentoGrid = ({ children, className }: { children: React.ReactNode; className?: string }) => {
     return (
@@ -46,13 +90,36 @@ const BentoItem = ({
 };
 
 export default function DashboardPage() {
+    const router = useRouter();
+    const [userName, setUserName] = useState("Guest");
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        fetchUserName().then(setUserName);
+        fetchEvents().then(setEvents);
+    }, []);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+                router.push("/");
+            }
+        };
+
+        checkAuth();
+    }, [router]);
+
     return (
         <div className="container mx-auto px-4 pb-24 pt-24 md:pt-28">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-white">
-                        Good Evening, <span className="text-gradient">Alex</span>
+                        Good Evening, <span className="text-gradient">{userName}</span>
                     </h1>
                     <p className="text-zinc-600 dark:text-zinc-400">Ready for tonight's campus vibe?</p>
                 </div>
@@ -75,7 +142,7 @@ export default function DashboardPage() {
                         <span className="text-red-500 font-bold tracking-wider text-xs uppercase">Live Now</span>
                     </div>
 
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1544197150-b99a580bbcbf?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-[url('/images/placeholder.jpg')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
                     <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full">

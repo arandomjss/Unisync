@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Heart, MessageCircle, Share2, MapPin, Calendar, Music, Code, Palette, Coffee } from "lucide-react";
 import Image from "next/image";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 const categories = [
     { name: "All", icon: null },
@@ -18,7 +21,7 @@ const mockEvents = [
         id: 1,
         title: "Neon Nights: Rooftop Party",
         organizer: "Student Union",
-        image: "https://images.unsplash.com/photo-1514525253440-b39333251cdd?auto=format&fit=crop&q=80",
+        image: "/images/placeholder.jpg",
         date: "Tonight, 9:00 PM",
         location: "Union Roof",
         likes: 342,
@@ -28,7 +31,7 @@ const mockEvents = [
         id: 2,
         title: "Inter-Uni Hackathon 2026",
         organizer: "CS Society",
-        image: "https://images.unsplash.com/photo-1504384308090-c54be3855833?auto=format&fit=crop&q=80",
+        image: "/images/placeholder.jpg",
         date: "Tomorrow, 10:00 AM",
         location: "Engineering Hall",
         likes: 856,
@@ -38,7 +41,7 @@ const mockEvents = [
         id: 3,
         title: "Abstract Art Exhibition",
         organizer: "Fine Arts Club",
-        image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80",
+        image: "/images/placeholder.jpg",
         date: "Fri, 5:00 PM",
         location: "Gallery A",
         likes: 120,
@@ -47,6 +50,22 @@ const mockEvents = [
 ];
 
 export default function ExplorePage() {
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+                router.push("/");
+            }
+        };
+
+        checkAuth();
+    }, [router]);
+
     return (
         <div className="container mx-auto px-4 pb-24 pt-24 md:pt-28 max-w-2xl">
             <div className="flex flex-col items-center mb-8">
