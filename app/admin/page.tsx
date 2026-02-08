@@ -1,7 +1,26 @@
 import GlassCard from "@/components/GlassCard";
 import EventTable from "@/components/admin/EventTable";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        router.push("/");
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
   return (
     <main className="min-h-screen bg-background p-6 pt-24">
       <h1 className="text-3xl font-bold text-zinc-800 dark:text-white mb-6">Admin Dashboard</h1>

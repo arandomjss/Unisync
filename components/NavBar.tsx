@@ -6,20 +6,82 @@ import { motion } from "framer-motion";
 import { Home, Compass, User, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
-const navItems = [
-  { name: "Home", href: "/dashboard", icon: Home },
-  { name: "Explore", href: "/explore", icon: Compass },
-  { name: "Events", href: "/events", icon: Calendar },
-  { name: "Profile", href: "/profile", icon: User },
-  { name: "Admin Dashboard", href: "/admin", icon: Compass },
-  { name: "Manage Events", href: "/admin/events", icon: Calendar },
-  { name: "Club Dashboard", href: "/club/dashboard", icon: User },
-  { name: "Your Events", href: "/club/events", icon: Calendar },
-];
+const roleBasedNavItems = {
+  user: [
+    { name: "Home", href: "/dashboard", icon: Home },
+    { name: "Explore", href: "/explore", icon: Compass },
+    { name: "Events", href: "/events", icon: Calendar },
+    { name: "Profile", href: "/profile", icon: User },
+  ],
+  admin: [
+    { name: "Admin Dashboard", href: "/admin", icon: Compass },
+    { name: "Manage Events", href: "/admin/events", icon: Calendar },
+  ],
+  clubAdmin: [
+    { name: "Club Dashboard", href: "/club/dashboard", icon: User },
+    { name: "Your Events", href: "/club/events", icon: Calendar },
+  ],
+};
 
 export default function NavBar() {
   const pathname = usePathname();
+  const [userRole, setUserRole] = useState("user");
+  const [isClubAdmin, setIsClubAdmin] = useState(false);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        console.error("User is not logged in.");
+        return;
+      }
+
+      const userId = session.user.id;
+
+      // Fetch user role from users table
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", userId)
+        .single();
+
+      if (userError) {
+        console.error("Error fetching user role:", userError);
+        return;
+      }
+
+      setUserRole(userData.role || "user");
+
+      // Check if the user is a club admin in the club_memberships table
+      const { data: clubData, error: clubError } = await supabase
+        .from("club_memberships")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin");
+
+      if (clubError) {
+        console.error("Error checking club admin role:", clubError);
+        return;
+      }
+
+      setIsClubAdmin(clubData.length > 0);
+    };
+
+    fetchUserRole();
+  }, []);
+
+  const navItems = [
+    ...roleBasedNavItems.user,
+    ...(userRole === "admin" ? roleBasedNavItems.admin : []),
+    ...(isClubAdmin ? roleBasedNavItems.clubAdmin : []),
+  ];
 
   return (
     <>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { clubs, events, type Event, type Club } from "@/lib/data";
@@ -8,8 +8,26 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ChevronLeft, ChevronRight, MapPin, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function EventsPage() {
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+                router.push("/");
+            }
+        };
+
+        checkAuth();
+    }, [router]);
+
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedClubs, setSelectedClubs] = useState<string[]>(clubs.map(c => c.id));

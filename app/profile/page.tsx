@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -13,21 +14,21 @@ export default function ProfilePage() {
   const [bio, setBio] = useState("No bio available.");
   const [name, setName] = useState("");
 
+  const router = useRouter();
+
   useEffect(() => {
     const checkAuth = async () => {
       const {
         data: { session },
-        error: sessionError,
       } = await supabase.auth.getSession();
 
-      if (sessionError || !session) {
-        console.error("User is not logged in. Redirecting to landing page.");
-        window.location.href = "/"; // Redirect to landing page
+      if (!session) {
+        router.push("/");
       }
     };
 
     checkAuth();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -182,7 +183,7 @@ export default function ProfilePage() {
             <h3 className="text-lg font-bold text-zinc-700 dark:text-white mb-2 flex items-center gap-2"><Users size={18} />Clubs</h3>
             <ul className="space-y-2">
               {user.clubs?.map((club) => (
-                <li key={club.name} className="flex items-center gap-2">
+                <li key={`${club.id}-${club.name}`} className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${club.color}`}></span>
                   <span className="text-zinc-700 dark:text-zinc-100 text-sm">{club.name}</span>
                 </li>

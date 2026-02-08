@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Heart, MessageCircle, Share2, MapPin, Calendar, Music, Code, Palette, Coffee } from "lucide-react";
 import Image from "next/image";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 const categories = [
     { name: "All", icon: null },
@@ -47,6 +50,22 @@ const mockEvents = [
 ];
 
 export default function ExplorePage() {
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const {
+                data: { session },
+            } = await supabase.auth.getSession();
+
+            if (!session) {
+                router.push("/");
+            }
+        };
+
+        checkAuth();
+    }, [router]);
+
     return (
         <div className="container mx-auto px-4 pb-24 pt-24 md:pt-28 max-w-2xl">
             <div className="flex flex-col items-center mb-8">
