@@ -8,6 +8,8 @@ interface Event {
   title: string;
   club_name: string;
   date: string;
+  location: string;
+  capacity: string;
 }
 
 interface EventTableProps {
@@ -21,18 +23,20 @@ export default function EventTable({ className }: EventTableProps) {
     async function fetchEvents() {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, date, clubs!inner(name)")
+        .select("id, title, date, clubs!inner(name), location, capacity")
         .eq("status", "pending")
         .order("date", { ascending: true });
 
       if (error) {
         console.error("Error fetching events:", error);
       } else {
-        const formattedEvents = data.map((event) => ({
+        const formattedEvents = data.map((event: any) => ({
           id: event.id,
           title: event.title,
-          club_name: Array.isArray(event.clubs) ? event.clubs[0]?.name : event.clubs?.name || "Unknown Club", // Handle both array and object cases
+          club_name: event.clubs?.name || "Unknown Club",
           date: event.date,
+          location: event.location || "Location not specified",
+          capacity: event.capacity || "Capacity not specified",
         }));
         setEvents(formattedEvents);
       }
@@ -49,6 +53,8 @@ export default function EventTable({ className }: EventTableProps) {
             <th className="py-2 px-4 text-zinc-600 dark:text-zinc-400">Event Name</th>
             <th className="py-2 px-4 text-zinc-600 dark:text-zinc-400">Club</th>
             <th className="py-2 px-4 text-zinc-600 dark:text-zinc-400">Date</th>
+            <th className="py-2 px-4 text-zinc-600 dark:text-zinc-400">Location</th>
+            <th className="py-2 px-4 text-zinc-600 dark:text-zinc-400">Capacity</th>
             <th className="py-2 px-4 text-zinc-600 dark:text-zinc-400">Actions</th>
           </tr>
         </thead>
@@ -58,6 +64,8 @@ export default function EventTable({ className }: EventTableProps) {
               <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.title}</td>
               <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.club_name}</td>
               <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.date}</td>
+              <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.location}</td>
+              <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.capacity}</td>
               <td className="py-2 px-4">
                 <button className="text-green-500 hover:underline mr-2">Approve</button>
                 <button className="text-red-500 hover:underline">Reject</button>

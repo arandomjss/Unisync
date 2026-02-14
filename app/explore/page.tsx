@@ -20,8 +20,36 @@ const categories = [
 
 export default function ExplorePage() {
     const router = useRouter();
-    const [events, setEvents] = useState([]);
+    const [events, setEvents] = useState<Array<{
+        id: string;
+        title: string;
+        description: string;
+        date: string;
+        club_id: string;
+        created_at: string;
+        time: string;
+        location: string;
+        capacity: number;
+    }>>([]);
+    const [activeFilter, setActiveFilter] = useState<string | null>(null);
     const clubData = useClubData();
+
+    const fetchEvents = async (clubId: string | null = null) => {
+        const { data, error } = await supabase
+            .from("events")
+            .select("id, title, description, date, club_id, created_at, time, location, capacity")
+            .eq("status", "approved");
+
+        if (error) {
+            console.error("Error fetching events:", error);
+        } else {
+            if (clubId) {
+                setEvents(data?.filter((event) => event.club_id === clubId) || []);
+            } else {
+                setEvents(data || []);
+            }
+        }
+    };
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -34,22 +62,14 @@ export default function ExplorePage() {
             }
         };
 
-        const fetchEvents = async () => {
-            const { data, error } = await supabase
-                .from("events")
-                .select("id, title, description, date, club_id, created_at, time, location, capacity")
-                .eq("status", "approved");
-
-            if (error) {
-                console.error("Error fetching events:", error);
-            } else {
-                setEvents(data);
-            }
-        };
-
         checkAuth();
         fetchEvents();
     }, [router]);
+
+    const handleClubFilter = (clubId) => {
+        setActiveFilter(clubId);
+        fetchEvents(clubId);
+    };
 
     return (
         <div className="container mx-auto px-4 pb-24 pt-24 md:pt-28 max-w-6xl bg-background">
@@ -73,11 +93,23 @@ export default function ExplorePage() {
 
                 {/* Club Filter */}
                 <div className="flex gap-3 overflow-x-auto w-full pb-4 scrollbar-hide justify-start md:justify-center">
+                    <button
+                        onClick={() => {
+                            setActiveFilter(null);
+                            fetchEvents(); // Fetch all events
+                        }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all whitespace-nowrap ${!activeFilter ? 'bg-white/10 border-neon-purple/50' : 'bg-white/5 border-white/10'}`}
+                    >
+                        All
+                    </button>
                     {Object.keys(clubData).map((clubId) => (
                         <button
                             key={clubId}
-                            onClick={() => setEvents((prevEvents) => prevEvents.filter((event) => event.club_id === clubId))}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all whitespace-nowrap ${clubData[clubId]?.color} ${clubData[clubId]?.textColor}`}
+                            onClick={() => {
+                                setActiveFilter(clubId);
+                                fetchEvents(clubId); // Fetch events for the selected club
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all whitespace-nowrap ${activeFilter === clubId ? 'bg-white/10 border-neon-purple/50' : `${clubData[clubId]?.color} ${clubData[clubId]?.textColor}`}`}
                         >
                             {clubData[clubId]?.icon({ size: 14 })}
                             {clubData[clubId]?.name}

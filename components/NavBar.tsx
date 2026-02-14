@@ -18,7 +18,6 @@ const roleBasedNavItems = {
   ],
   admin: [
     { name: "Admin Dashboard", href: "/admin", icon: Compass },
-    { name: "Manage Events", href: "/admin/events", icon: Calendar },
   ],
   clubAdmin: [
     { name: "Club Dashboard", href: "/club/dashboard", icon: User },
