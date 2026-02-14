@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { FaRegCircle } from "react-icons/fa"; // Importing a default icon from react-icons
 import { useClubData } from "@/components/club/ClubUtils";
+import { enUS } from "date-fns/locale";
 
 export default function EventsPage() {
     const router = useRouter();
@@ -98,10 +99,13 @@ export default function EventsPage() {
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart);
-    const endDate = endOfWeek(monthEnd);
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 0, locale: enUS }); 
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 0, locale: enUS }); 
 
-    const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+    const calendarDays = eachDayOfInterval({
+        start: startDate,
+        end: endDate,
+    });
 
     const toggleClub = (clubId: string) => {
         setSelectedClubs(prev =>
