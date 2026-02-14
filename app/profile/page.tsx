@@ -7,12 +7,16 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Sparkles, User, Edit2, LogOut, Star, Calendar, Users, Mail, ShieldCheck, BadgeCheck } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { getClubColor, getClubIcon, getClubTextColor } from "@/components/club/ClubUtils";
+import { useClubData } from "@/components/club/ClubUtils";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [bio, setBio] = useState("No bio available.");
   const [name, setName] = useState("");
+
+  const clubData = useClubData(); 
 
   const router = useRouter();
 
@@ -106,7 +110,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center py-12 px-2 mt-24">
+      <div className="min-h-screen flex flex-col items-center py-12 px-2 mt-24">
         <GlassCard className="w-full max-w-4xl mx-auto p-0 overflow-visible glass-card text-zinc-800 dark:text-zinc-300">
           <div className="p-8">
             <h2 className="text-2xl font-bold text-zinc-700 dark:text-white">
@@ -122,7 +126,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center py-12 px-2 mt-24">
+    <div className="min-h-screen flex flex-col items-center py-12 px-2 mt-24">
       <GlassCard className="w-full max-w-4xl mx-auto p-0 overflow-visible glass-card text-zinc-800 dark:text-zinc-300">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 p-8 pb-4">
@@ -186,13 +190,21 @@ export default function ProfilePage() {
           <div>
             <h3 className="text-lg font-bold text-zinc-700 dark:text-white mb-2 flex items-center gap-2"><Users size={18} />Clubs</h3>
             <ul className="space-y-2">
-              {user.clubs?.map(({ club, role }) => (
-                <li key={club.id} className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full bg-gray-500`}></span> {/* Placeholder color */}
-                  <span className="text-zinc-700 dark:text-zinc-100 text-sm">
-                    {club.name} ({role})
+              {user.clubs?.map((club) => (
+                <div
+                  key={club.club.id}
+                  className="flex items-center gap-2"
+                >
+                  <span className={`flex items-center`}>
+                    <span className={`${getClubColor(clubData, club.club.id)} rounded-full p-1`}>
+                      {getClubIcon(clubData, club.club.id)({ size: 20 })}
+                    </span>
                   </span>
-                </li>
+                  <h3 className="text-base font-medium" style={{ color: `var(--${getClubColor(clubData, club.club.id)})` }}>
+                    {club.club.name}
+                  </h3>
+                  <p className="text-xs text-zinc-500 ml-2">{club.role}</p>
+                </div>
               ))}
             </ul>
           </div>

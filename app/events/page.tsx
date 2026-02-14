@@ -11,9 +11,11 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { FaRegCircle } from "react-icons/fa"; // Importing a default icon from react-icons
+import { useClubData } from "@/components/club/ClubUtils";
 
 export default function EventsPage() {
     const router = useRouter();
+    const clubData = useClubData();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -74,20 +76,20 @@ export default function EventsPage() {
                     id: club.id,
                     name: club.name,
                     description: club.description,
-                    icon: getClubIcon(club.id), // Map club ID to icon
-                    color: getClubColor(club.id), // Map club ID to color
-                    textColor: getClubTextColor(club.id), // Map club ID to text color
+                    icon: getClubIcon(clubData, club.id), 
+                    color: getClubColor(clubData, club.id), 
+                    textColor: getClubTextColor(clubData, club.id), 
                 }));
                 setClubs(processedClubs);
             }
         };
 
         fetchClubs();
-    }, []);
+    }, [clubData]);
 
     useEffect(() => {
         if (clubs.length > 0) {
-            setSelectedClubs(clubs.map(c => c.id)); // Update selectedClubs after clubs are fetched
+            setSelectedClubs(clubs.map(c => c.id)); 
         }
     }, [clubs]);
 
@@ -137,7 +139,7 @@ export default function EventsPage() {
 
                     <div className="flex flex-wrap md:flex-col gap-2">
                         {clubs.map(club => {
-                            const Icon = getClubIcon(club.id);
+                            const Icon = getClubIcon(clubs, club.id);
                             const isSelected = selectedClubs.includes(club.id);
                             return (
                                 <button
@@ -215,9 +217,9 @@ export default function EventsPage() {
                                                 return (
                                                     <div
                                                         key={event.id}
-                                                        className="flex items-center gap-1"
+                                                        className="flex items-center gap-2"
                                                     >
-                                                        {club?.icon && <club.icon className="w-4 h-4" />}
+                                                        <div className={cn("w-3 h-3 rounded-full", club?.color || "bg-gray-500")}></div>
                                                         <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{club?.name}</span>
                                                     </div>
                                                 );
@@ -293,39 +295,4 @@ export default function EventsPage() {
     );
 }
 
-// Helper functions to map club properties
-const getClubIcon = (clubId) => {
-    const icons = {
-        '09b9cf73-a10c-4711-b27e-4096e9f0c837': FaRegCircle,
-        '3f2c1e6d-3517-42d2-a36a-f206ea79726f': FaRegCircle,
-        '61127212-e8de-4c35-ae18-b7850b01375e': FaRegCircle,
-        'f2bc2c06-7cbb-4796-8439-39363811aaa6': FaRegCircle,
-        '6ba1c130-ee8a-4197-9c1f-384f81cdb575': FaRegCircle,
-        '0df6c4b8-2cbd-4e5a-b474-b778638340c5': FaRegCircle,
-    };
-    return icons[clubId] || FaRegCircle; // Use FaRegCircle as the default icon
-};
-
-const getClubColor = (clubId) => {
-    const colors = {
-        '09b9cf73-a10c-4711-b27e-4096e9f0c837': 'bg-red-500',
-        '3f2c1e6d-3517-42d2-a36a-f206ea79726f': 'bg-green-500',
-        '61127212-e8de-4c35-ae18-b7850b01375e': 'bg-blue-500',
-        'f2bc2c06-7cbb-4796-8439-39363811aaa6': 'bg-pink-500',
-        '6ba1c130-ee8a-4197-9c1f-384f81cdb575': 'bg-teal-500',
-        '0df6c4b8-2cbd-4e5a-b474-b778638340c5': 'bg-yellow-500',
-    };
-    return colors[clubId] || 'bg-gray-500';
-};
-
-const getClubTextColor = (clubId) => {
-    const textColors = {
-        '09b9cf73-a10c-4711-b27e-4096e9f0c837': 'text-white',
-        '3f2c1e6d-3517-42d2-a36a-f206ea79726f': 'text-black',
-        '61127212-e8de-4c35-ae18-b7850b01375e': 'text-white',
-        'f2bc2c06-7cbb-4796-8439-39363811aaa6': 'text-white',
-        '6ba1c130-ee8a-4197-9c1f-384f81cdb575': 'text-black',
-        '0df6c4b8-2cbd-4e5a-b474-b778638340c5': 'text-black',
-    };
-    return textColors[clubId] || 'text-black';
-};
+import { getClubIcon, getClubColor, getClubTextColor } from "@/components/club/ClubUtils";

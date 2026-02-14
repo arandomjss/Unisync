@@ -7,6 +7,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useClubData } from "@/components/club/ClubUtils";
+import { clubData } from "@/components/club/ClubUtils";
 
 const categories = [
     { name: "All", icon: null },
@@ -19,6 +21,7 @@ const categories = [
 export default function ExplorePage() {
     const router = useRouter();
     const [events, setEvents] = useState([]);
+    const clubData = useClubData();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -34,7 +37,7 @@ export default function ExplorePage() {
         const fetchEvents = async () => {
             const { data, error } = await supabase
                 .from("events")
-                .select("id, title, description, date, club_id, created_at, time, location, capacity, clubs(name)")
+                .select("id, title, description, date, club_id, created_at, time, location, capacity")
                 .eq("status", "approved");
 
             if (error) {
@@ -64,6 +67,20 @@ export default function ExplorePage() {
                         >
                             {cat.icon && <cat.icon size={14} className="text-neon-blue" />}
                             {cat.name}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Club Filter */}
+                <div className="flex gap-3 overflow-x-auto w-full pb-4 scrollbar-hide justify-start md:justify-center">
+                    {Object.keys(clubData).map((clubId) => (
+                        <button
+                            key={clubId}
+                            onClick={() => setEvents((prevEvents) => prevEvents.filter((event) => event.club_id === clubId))}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all whitespace-nowrap ${clubData[clubId]?.color} ${clubData[clubId]?.textColor}`}
+                        >
+                            {clubData[clubId]?.icon({ size: 14 })}
+                            {clubData[clubId]?.name}
                         </button>
                     ))}
                 </div>
@@ -109,13 +126,11 @@ export default function ExplorePage() {
                             <h2 className="text-xl font-bold text-zinc-800 dark:text-white mb-2">
                                 {event.title}
                             </h2>
-
-                            {/* Club Tag */}
-                            {event.clubs?.name && (
-                                <span className="inline-block px-3 py-1 text-xs font-medium text-white bg-neon-purple rounded-full mb-4">
-                                    {event.clubs.name}
-                                </span>
-                            )}
+                            <span
+                                className={`inline-block px-3 py-1 text-xs font-medium rounded-full mb-4 ${clubData[event.club_id]?.color} ${clubData[event.club_id]?.textColor}`}
+                            >
+                                {clubData[event.club_id]?.name}
+                            </span>
 
                             {/* Actions */}
                             <div className="flex items-center justify-between border-t border-zinc-200 dark:border-white/10 pt-4">
