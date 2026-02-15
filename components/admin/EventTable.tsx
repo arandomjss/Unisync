@@ -45,6 +45,34 @@ export default function EventTable({ className }: EventTableProps) {
     fetchEvents();
   }, []);
 
+  const handleApprove = async (eventId: string) => {
+    const { error } = await supabase
+      .from("events")
+      .update({ status: "approved" })
+      .eq("id", eventId);
+
+    if (error) {
+      console.error("Error approving event:", error);
+    } else {
+      console.log("Event approved successfully");
+      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
+    }
+  };
+
+  const handleReject = async (eventId: string) => {
+    const { error } = await supabase
+      .from("events")
+      .update({ status: "rejected" })
+      .eq("id", eventId);
+
+    if (error) {
+      console.error("Error rejecting event:", error);
+    } else {
+      console.log("Event rejected successfully");
+      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== eventId));
+    }
+  };
+
   return (
     <div className={`${className} bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-md`}>
       <table className="w-full text-left">
@@ -67,8 +95,18 @@ export default function EventTable({ className }: EventTableProps) {
               <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.location}</td>
               <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.capacity}</td>
               <td className="py-2 px-4">
-                <button className="text-green-500 hover:underline mr-2">Approve</button>
-                <button className="text-red-500 hover:underline">Reject</button>
+                <button
+                  onClick={() => handleApprove(event.id)}
+                  className="text-green-500 hover:underline mr-2"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => handleReject(event.id)}
+                  className="text-red-500 hover:underline"
+                >
+                  Reject
+                </button>
               </td>
             </tr>
           ))}

@@ -67,7 +67,9 @@ export default function ClubDashboard() {
           return;
         }
 
-        const upcomingEvents = events.filter((event) => new Date(event.date) >= new Date()).length;
+        const upcomingEvents = events.filter(
+          (event) => new Date(event.date) >= new Date() && event.status !== "rejected"
+        ).length;
 
         setClubStats({
           upcomingEvents,
@@ -168,7 +170,9 @@ export default function ClubDashboard() {
                 <tr key={event.id} className="border-b border-zinc-200 dark:border-zinc-700">
                   <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.title}</td>
                   <td className="py-2 px-4 text-zinc-800 dark:text-white">{event.date}</td>
-                  <td className={cn("py-2 px-4", event.status === "approved" ? "text-green-500" : "text-yellow-500")}>{event.status}</td>
+                  <td className={cn("py-2 px-4",event.status === "approved" ? "text-green-500": event.status === "pending"? "text-yellow-500": "text-red-500")}>
+                    {event.status}
+                  </td>
                 </tr>
               ))}
             </tbody>
