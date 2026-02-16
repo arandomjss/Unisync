@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Heart, MessageCircle, Share2, MapPin, Calendar, Music, Code, Palette, Coffee, Clock, GaugeCircle } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -177,9 +178,11 @@ export default function ExplorePage() {
                                         <Share2 size={20} />
                                     </button>
                                 </div>
-                                <Button size="sm" variant="neon" className="rounded-full px-6 h-9">
-                                    Get Tickets
-                                </Button>
+                                <Link href={`/events/${event.id}`} key={event.id} className="w-full md:w-auto">
+                                    <Button size="sm" variant="neon" className="rounded-full px-6 h-9 w-full md:w-auto">
+                                        Get Tickets
+                                    </Button>
+                                </Link>
                             </div>
                         </div>
                     </motion.div>

@@ -28,10 +28,7 @@ const nextConfig = {
                 source: '/club/:path*',
                 destination: '/api/proxy?path=/club/:path*',
             },
-            {
-                source: '/events/:path*',
-                destination: '/api/proxy?path=/events/:path*',
-            },
+
         ];
     },
 };

@@ -3,12 +3,36 @@
 import { useState, useEffect } from "react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { clubs, type Event, type Club } from "@/lib/data";
+
 import { Button } from "@/components/ui/Button";
+
+interface Event {
+    id: string;
+    title: string;
+    description: string;
+    date: Date;
+    status: string;
+    clubId: string;
+    time: string;
+    location: string;
+    capacity: string;
+    type?: string;
+}
+
+interface Club {
+    id: string;
+    name: string;
+    description: string;
+    icon: any;
+    color: string;
+    textColor: string;
+    shortName?: string;
+}
 import { Card, CardContent } from "@/components/ui/Card";
 import { ChevronLeft, ChevronRight, MapPin, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 import { FaRegCircle } from "react-icons/fa"; // Importing a default icon from react-icons
 import { useClubData } from "@/components/club/ClubUtils";
@@ -35,7 +59,7 @@ export default function EventsPage() {
     const [events, setEvents] = useState<Event[]>([]); // Initialize events state
     const [selectedClubs, setSelectedClubs] = useState<string[]>([]); // Initialize selectedClubs as an empty array
 
-    const [clubs, setClubs] = useState([]); // Initialize clubs state
+    const [clubs, setClubs] = useState<Club[]>([]); // Initialize clubs state
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -56,6 +80,7 @@ export default function EventsPage() {
                     time: event.time || 'Time not specified',
                     location: event.location || 'Location not specified',
                     capacity: event.capacity ? `${event.capacity}` : 'Capacity not specified', // Removed repetition of 'seats'
+                    type: "Event" // Default type as it is missing in query
                 }));
                 setEvents(processedEvents);
             }
@@ -77,9 +102,10 @@ export default function EventsPage() {
                     id: club.id,
                     name: club.name,
                     description: club.description,
-                    icon: getClubIcon(clubData, club.id), 
-                    color: getClubColor(clubData, club.id), 
-                    textColor: getClubTextColor(clubData, club.id), 
+                    icon: getClubIcon(clubData, club.id),
+                    color: getClubColor(clubData, club.id),
+                    textColor: getClubTextColor(clubData, club.id),
+                    shortName: club.name.substring(0, 3).toUpperCase()
                 }));
                 setClubs(processedClubs);
             }
@@ -90,7 +116,7 @@ export default function EventsPage() {
 
     useEffect(() => {
         if (clubs.length > 0) {
-            setSelectedClubs(clubs.map(c => c.id)); 
+            setSelectedClubs(clubs.map(c => c.id));
         }
     }, [clubs]);
 
@@ -99,8 +125,8 @@ export default function EventsPage() {
 
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart, { weekStartsOn: 0, locale: enUS }); 
-    const endDate = endOfWeek(monthEnd, { weekStartsOn: 0, locale: enUS }); 
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 0, locale: enUS });
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 0, locale: enUS });
 
     const calendarDays = eachDayOfInterval({
         start: startDate,
@@ -283,9 +309,11 @@ export default function EventsPage() {
                                                 </div>
                                             </div>
 
-                                            <Button className="w-full md:w-auto rounded-full">
-                                                View Details
-                                            </Button>
+                                            <Link href={`/events/${event.id}`} className="w-full md:w-auto">
+                                                <Button className="w-full md:w-auto rounded-full">
+                                                    View Details
+                                                </Button>
+                                            </Link>
                                         </motion.div>
                                     );
                                 })}
