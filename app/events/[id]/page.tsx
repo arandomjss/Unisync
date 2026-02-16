@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { Calendar, MapPin, Clock, GaugeCircle, ArrowLeft, Share2, Heart } from "lucide-react";
+import { Calendar, MapPin, Clock, GaugeCircle, ArrowLeft, Share2, Heart, UserPlus, Check, X } from "lucide-react";
 import Image from "next/image";
 import { useClubData } from "@/components/club/ClubUtils";
 
@@ -16,6 +16,8 @@ export default function EventDetailsPage() {
     const clubData = useClubData();
     const [event, setEvent] = useState<any | null>(null);
     const [loading, setLoading] = useState(true);
+    const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -25,7 +27,9 @@ export default function EventDetailsPage() {
 
             if (!session) {
                 router.push("/");
+                return;
             }
+            setUserId(session.user.id);
         };
 
         const fetchEvent = async () => {
@@ -49,6 +53,48 @@ export default function EventDetailsPage() {
         checkAuth();
         fetchEvent();
     }, [id, router]);
+
+    // Fetch membership status when event and user are loaded
+    useEffect(() => {
+        const fetchMembership = async () => {
+            if (!event || !userId) return;
+
+            const { data, error } = await supabase
+                .from("club_memberships")
+                .select("status")
+                .eq("club_id", event.club_id)
+                .eq("user_id", userId)
+                .single();
+
+            if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows found"
+                console.error("Error fetching membership:", error);
+            } else {
+                setMembershipStatus(data?.status || null);
+            }
+        };
+
+        fetchMembership();
+    }, [event, userId]);
+
+    const handleJoinClub = async () => {
+        if (!event || !userId) return;
+
+        const { error } = await supabase.from("club_memberships").insert([
+            {
+                club_id: event.club_id,
+                user_id: userId,
+                role: "member",
+                status: "pending",
+            },
+        ]);
+
+        if (error) {
+            console.error("Error joining club:", error);
+            alert("Failed to send join request.");
+        } else {
+            setMembershipStatus("pending");
+        }
+    };
 
     if (loading) {
         return (
@@ -77,7 +123,7 @@ export default function EventDetailsPage() {
                 <Button
                     variant="ghost"
                     onClick={() => router.back()}
-                    className="mb-6 hover:bg-white/5 text-zinc-400 hover:text-white"
+                    className="mb-6 hover:bg-white/5 text-zinc-400 hover:text-white transition-colors"
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
@@ -114,19 +160,40 @@ export default function EventDetailsPage() {
                     </div>
 
                     <div className="p-6 md:p-10 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md">
-                        {/* Club Badge */}
-                        <div className="flex items-center gap-3 mb-6">
-                            {club && (
-                                <div className={`p-2 rounded-xl ${club.color} ${club.textColor}`}>
-                                    <club.icon size={20} />
+                        {/* Club Badge & Join Action */}
+                        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                {club && (
+                                    <div className={`p-2 rounded-xl ${club.color} ${club.textColor}`}>
+                                        <club.icon size={20} />
+                                    </div>
+                                )}
+                                <span className="text-sm font-medium px-3 py-1 rounded-full border border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-zinc-800/50">
+                                    {club?.name || "Unknown Club"}
+                                </span>
+                                <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${event.status === 'approved' ? 'border-green-500/50 text-green-500' : 'border-yellow-500/50 text-yellow-500'}`}>
+                                    {event.status}
+                                </span>
+                            </div>
+
+                            {/* Membership Status Button */}
+                            {membershipStatus === 'approved' ? (
+                                <div className="flex items-center gap-2 text-green-500 font-medium text-sm px-3 py-1.5 bg-green-500/10 rounded-full">
+                                    <Check size={16} /> Member
                                 </div>
+                            ) : membershipStatus === 'pending' ? (
+                                <div className="flex items-center gap-2 text-yellow-500 font-medium text-sm px-3 py-1.5 bg-yellow-500/10 rounded-full">
+                                    <Clock size={16} /> Request Pending
+                                </div>
+                            ) : membershipStatus === 'rejected' ? (
+                                <div className="flex items-center gap-2 text-red-500 font-medium text-sm px-3 py-1.5 bg-red-500/10 rounded-full">
+                                    <X size={16} /> Application Rejected
+                                </div>
+                            ) : (
+                                <Button size="sm" variant="neon" onClick={handleJoinClub} className="gap-2">
+                                    <UserPlus size={16} /> Join Club
+                                </Button>
                             )}
-                            <span className="text-sm font-medium px-3 py-1 rounded-full border border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-zinc-800/50">
-                                {club?.name || "Unknown Club"}
-                            </span>
-                            <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${event.status === 'approved' ? 'border-green-500/50 text-green-500' : 'border-yellow-500/50 text-yellow-500'}`}>
-                                {event.status}
-                            </span>
                         </div>
 
                         <h1 className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-neon-purple mb-6">

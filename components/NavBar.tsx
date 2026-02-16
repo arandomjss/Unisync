@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { Home, Compass, User, Calendar } from "lucide-react";
+import { Home, Compass, User, Calendar, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { useEffect, useState } from "react";
@@ -22,6 +22,7 @@ const roleBasedNavItems = {
   clubAdmin: [
     { name: "Club Dashboard", href: "/club/dashboard", icon: User },
     { name: "Your Events", href: "/club/events", icon: Calendar },
+    { name: "Members", href: "/club/members", icon: Users },
   ],
 };
 

@@ -8,15 +8,16 @@ import { FaCalendarAlt, FaClock, FaAlignLeft, FaBuilding, FaTag } from "react-ic
 
 interface EventSubmissionFormProps {
   className?: string; // Allow custom class names
+  onSuccess?: () => void;
 }
 
-export default function EventSubmissionForm({ className }: EventSubmissionFormProps) {
+export default function EventSubmissionForm({ className, onSuccess }: EventSubmissionFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [club, setClub] = useState("");
-  const [clubs, setClubs] = useState([]);
+  const [clubs, setClubs] = useState<{ id: string; name: string }[]>([]);
   const [location, setLocation] = useState("");
   const [capacity, setCapacity] = useState("");
 
@@ -42,10 +43,14 @@ export default function EventSubmissionForm({ className }: EventSubmissionFormPr
       if (error) {
         console.error("Error fetching clubs:", error);
       } else {
-        const filteredClubs = data.map((membership) => ({
-          id: membership.club_id,
-          name: membership.clubs.name,
-        }));
+        const filteredClubs = data.map((membership: any) => {
+          // Handle case where clubs might be returned as an array or object
+          const clubData = Array.isArray(membership.clubs) ? membership.clubs[0] : membership.clubs;
+          return {
+            id: membership.club_id,
+            name: clubData?.name || "Unknown Club",
+          };
+        });
         setClubs(filteredClubs || []);
       }
     };
@@ -85,6 +90,7 @@ export default function EventSubmissionForm({ className }: EventSubmissionFormPr
       setClub("");
       setLocation("");
       setCapacity("");
+      if (onSuccess) onSuccess();
     }
   };
 

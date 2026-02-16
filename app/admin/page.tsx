@@ -13,6 +13,7 @@ export default function AdminDashboard() {
     totalEvents: 0,
     activeClubs: 0,
     pendingApprovals: 0,
+    totalUsers: 0,
   });
 
   useEffect(() => {
@@ -27,16 +28,18 @@ export default function AdminDashboard() {
     };
 
     const fetchStats = async () => {
-      const [{ data: events }, { data: clubs }, { data: pendingEvents }] = await Promise.all([
-        supabase.from("events").select("id"),
-        supabase.from("clubs").select("id"),
-        supabase.from("events").select("id").eq("status", "pending"),
+      const [{ count: eventsCount }, { count: clubsCount }, { count: pendingEventsCount }, { count: usersCount }] = await Promise.all([
+        supabase.from("events").select("*", { count: 'exact', head: true }),
+        supabase.from("clubs").select("*", { count: 'exact', head: true }),
+        supabase.from("events").select("*", { count: 'exact', head: true }).eq("status", "pending"),
+        supabase.from("users").select("*", { count: 'exact', head: true }),
       ]);
 
       setStats({
-        totalEvents: events?.length || 0,
-        activeClubs: clubs?.length || 0,
-        pendingApprovals: pendingEvents?.length || 0,
+        totalEvents: eventsCount || 0,
+        activeClubs: clubsCount || 0,
+        pendingApprovals: pendingEventsCount || 0,
+        totalUsers: usersCount || 0,
       });
     };
 
@@ -61,7 +64,7 @@ export default function AdminDashboard() {
       <h1 className="text-3xl font-bold text-zinc-800 dark:text-white mb-6">Admin Dashboard</h1>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <GlassCard className="p-6 glass-card">
           <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">Total Events</h2>
           <p className="text-3xl font-bold text-neon-blue">{stats.totalEvents}</p>
@@ -73,6 +76,10 @@ export default function AdminDashboard() {
         <GlassCard className="p-6 glass-card">
           <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">Pending Approvals</h2>
           <p className="text-3xl font-bold text-neon-yellow">{stats.pendingApprovals}</p>
+        </GlassCard>
+        <GlassCard className="p-6 glass-card">
+          <h2 className="text-xl font-semibold text-zinc-800 dark:text-white">Total Users</h2>
+          <p className="text-3xl font-bold text-neon-green">{stats.totalUsers}</p>
         </GlassCard>
       </div>
 
@@ -121,10 +128,19 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Placeholder for User Management */}
-      <div className="mt-10">
+      {/* User Management Section */}
+      <div className="mt-10 mb-20">
         <h2 className="text-2xl font-bold text-zinc-800 dark:text-white mb-4">User Management</h2>
-        <p className="text-zinc-600 dark:text-zinc-400">Feature coming soon...</p>
+        <GlassCard className="p-6 glass-card">
+          <h3 className="text-lg font-semibold text-zinc-800 dark:text-white">Manage Users</h3>
+          <p className="text-zinc-600 dark:text-zinc-400">View and manage all registered users, and update their roles.</p>
+          <Button
+            onClick={() => router.push('/admin/users')}
+            className="mt-4 bg-zinc-800 text-white px-4 py-2 rounded-lg hover:bg-zinc-900 transition-all"
+          >
+            Go to User Management
+          </Button>
+        </GlassCard>
       </div>
     </main>
   );

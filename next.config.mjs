@@ -24,10 +24,7 @@ const nextConfig = {
                 source: '/admin/:path*',
                 destination: '/api/proxy?path=/admin/:path*',
             },
-            {
-                source: '/club/:path*',
-                destination: '/api/proxy?path=/club/:path*',
-            },
+
 
         ];
     },

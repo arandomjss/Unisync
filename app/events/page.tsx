@@ -65,7 +65,8 @@ export default function EventsPage() {
         const fetchEvents = async () => {
             const { data, error } = await supabase
                 .from('events')
-                .select('id, title, description, date, status, club_id, time, location, capacity');
+                .select('id, title, description, date, status, club_id, time, location, capacity')
+                .eq('status', 'approved');
 
             if (error) {
                 console.error('Error fetching events:', error);
