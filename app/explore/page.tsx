@@ -159,11 +159,13 @@ export default function ExplorePage() {
                             <h2 className="text-xl font-bold text-zinc-800 dark:text-white mb-2">
                                 {event.title}
                             </h2>
-                            <span
-                                className={`inline-block px-3 py-1 text-xs font-medium rounded-full mb-4 ${clubData[event.club_id]?.color} ${clubData[event.club_id]?.textColor}`}
-                            >
-                                {clubData[event.club_id]?.name}
-                            </span>
+                            <Link href={`/clubs/${event.club_id}`}>
+                                <span
+                                    className={`inline-block px-3 py-1 text-xs font-medium rounded-full mb-4 cursor-pointer hover:opacity-80 transition-opacity ${clubData[event.club_id]?.color} ${clubData[event.club_id]?.textColor}`}
+                                >
+                                    {clubData[event.club_id]?.name}
+                                </span>
+                            </Link>
 
                             {/* Actions */}
                             <div className="flex items-center justify-between border-t border-zinc-200 dark:border-white/10 pt-4">

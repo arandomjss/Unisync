@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Calendar, MapPin, Clock, GaugeCircle, ArrowLeft, Share2, Heart, UserPlus, Check, X } from "lucide-react";
 import Image from "next/image";
@@ -19,6 +21,10 @@ export default function EventDetailsPage() {
     const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
 
+    // Registration state
+    const [isRegistered, setIsRegistered] = useState(false);
+    const [registering, setRegistering] = useState(false);
+
     useEffect(() => {
         const checkAuth = async () => {
             const {
@@ -26,6 +32,8 @@ export default function EventDetailsPage() {
             } = await supabase.auth.getSession();
 
             if (!session) {
+                // router.push("/"); // Don't redirect immediately to allow public view? Or keep as is.
+                // Keeping original logic:
                 router.push("/");
                 return;
             }
@@ -54,7 +62,7 @@ export default function EventDetailsPage() {
         fetchEvent();
     }, [id, router]);
 
-    // Fetch membership status when event and user are loaded
+    // Fetch membership status
     useEffect(() => {
         const fetchMembership = async () => {
             if (!event || !userId) return;
@@ -64,13 +72,9 @@ export default function EventDetailsPage() {
                 .select("status")
                 .eq("club_id", event.club_id)
                 .eq("user_id", userId)
-                .single();
+                .maybeSingle();
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows found"
-                console.error("Error fetching membership:", error);
-            } else {
-                setMembershipStatus(data?.status || null);
-            }
+            if (data) setMembershipStatus(data.status);
         };
 
         fetchMembership();
@@ -96,6 +100,52 @@ export default function EventDetailsPage() {
         }
     };
 
+    useEffect(() => {
+        const fetchRegistrationStatus = async () => {
+            if (!id || !userId) return;
+
+            const { data, error } = await supabase
+                .from("event_participants")
+                .select("*")
+                .eq("event_id", id)
+                .eq("event_id", id)
+                .eq("user_id", userId)
+                .maybeSingle();
+
+            if (data) setIsRegistered(true);
+        };
+        fetchRegistrationStatus();
+    }, [id, userId]);
+
+    const handleGetTickets = async () => {
+        if (!userId) {
+            router.push("/");
+            return;
+        }
+        if (!id) {
+            console.error("Event ID is missing");
+            return;
+        }
+
+        setRegistering(true);
+
+        const { error } = await supabase
+            .from("event_participants")
+            .insert([{
+                event_id: id,
+                user_id: userId
+            }]);
+
+        if (error) {
+            console.error("Error registering:", error);
+            alert("Failed to register for event.");
+        } else {
+            setIsRegistered(true);
+            alert("Successfully registered!");
+        }
+        setRegistering(false);
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center min-h-screen bg-background text-neon-blue">
@@ -115,6 +165,7 @@ export default function EventDetailsPage() {
         );
     }
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const club = clubData[event.club_id];
 
     return (
@@ -168,9 +219,11 @@ export default function EventDetailsPage() {
                                         <club.icon size={20} />
                                     </div>
                                 )}
-                                <span className="text-sm font-medium px-3 py-1 rounded-full border border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-zinc-800/50">
-                                    {club?.name || "Unknown Club"}
-                                </span>
+                                <Link href={`/clubs/${event.club_id}`}>
+                                    <span className="text-sm font-medium px-3 py-1 rounded-full border border-zinc-200 dark:border-white/10 bg-white/50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer">
+                                        {club?.name || "Unknown Club"}
+                                    </span>
+                                </Link>
                                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${event.status === 'approved' ? 'border-green-500/50 text-green-500' : 'border-yellow-500/50 text-yellow-500'}`}>
                                     {event.status}
                                 </span>
@@ -255,8 +308,14 @@ export default function EventDetailsPage() {
                             <div className="text-sm text-zinc-500">
                                 Created by club admin on {new Date(event.created_at).toLocaleDateString()}
                             </div>
-                            <Button className="w-full md:w-auto px-8 py-6 text-lg rounded-full shadow-lg shadow-neon-blue/20 hover:shadow-neon-blue/40 transition-all">
-                                Get Tickets
+                            <Button
+                                onClick={handleGetTickets}
+                                disabled={isRegistered || registering}
+                                className={cn("w-full md:w-auto px-8 py-6 text-lg rounded-full shadow-lg transition-all",
+                                    isRegistered ? "bg-green-500 hover:bg-green-600 text-white shadow-green-500/20" : "shadow-neon-blue/20 hover:shadow-neon-blue/40"
+                                )}
+                            >
+                                {registering ? "Registering..." : isRegistered ? "Registered ✓" : "Get Tickets"}
                             </Button>
                         </div>
                     </div>
