@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import supabaseServer from "@/lib/supabaseServer";
+import { supabase } from "@/lib/supabaseClient";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        const { error } = await supabaseServer
+        const { error } = await supabase
             .from("users")
             .update({ password_hash: hashedPassword })
             .eq("id", userId);

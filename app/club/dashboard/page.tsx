@@ -81,7 +81,7 @@ export default function ClubDashboard() {
       }
 
       // 2.1 Fetch Registration Counts separately if events exist
-      let processedEvents = [];
+      let processedEvents: ClubEvent[] = [];
       if (events && events.length > 0) {
         const eventIds = events.map(e => e.id);
 
@@ -132,7 +132,7 @@ export default function ClubDashboard() {
       const upcoming = processedEvents.filter(
         (e) => new Date(e.date) >= new Date() && e.status !== "rejected"
       );
-      const totalRegistrations = processedEvents.reduce((sum, e) => sum + e.registration_count, 0);
+      const totalRegistrations = processedEvents.reduce((sum, e) => sum + (e.registration_count || 0), 0);
 
       setClubStats({
         upcomingEvents: upcoming.length,

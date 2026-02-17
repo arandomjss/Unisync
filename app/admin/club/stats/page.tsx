@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function ClubStatsPage() {
-  const [clubStats, setClubStats] = useState([]);
+  const [clubStats, setClubStats] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchClubStats = async () => {

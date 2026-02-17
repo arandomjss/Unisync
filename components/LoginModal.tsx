@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/Input";
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
-import supabaseServer from "@/lib/supabaseServer";
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -112,24 +111,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                     setIsLogin(true);
                 }
 
-                if (data.user?.id) {
-                    const { error: insertError } = await supabase
-                        .from("users")
-                        .insert({
-                            id: data.user.id,
-                            email,
-                            name: "New User",
-                            role: "user",
-                            created_at: new Date().toISOString(),
-                        });
-
-                    if (insertError) {
-                        console.error("Error inserting user into users table:", insertError);
-                        alert("Account created, but failed to initialize user profile.");
-                    } else {
-                        console.log("User profile initialized successfully.");
-                    }
-                }
             }
         } catch (err) {
             console.error("Unexpected error during authentication:", err);
@@ -173,22 +154,22 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                                 </p>
 
                                 <form className="space-y-5" onSubmit={handleLogin}>
-                                    <Input 
-                                        placeholder="University Email" 
-                                        type="email" 
+                                    <Input
+                                        placeholder="University Email"
+                                        type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                     />
-                                    <Input 
-                                        placeholder="Password" 
-                                        type="password" 
+                                    <Input
+                                        placeholder="Password"
+                                        type="password"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                     />
                                     {!isLogin && (
-                                        <Input 
-                                            placeholder="Confirm Password" 
-                                            type="password" 
+                                        <Input
+                                            placeholder="Confirm Password"
+                                            type="password"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                         />

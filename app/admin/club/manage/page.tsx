@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/Button";
 
 export default function ManagePage() {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -21,7 +21,7 @@ export default function ManagePage() {
     fetchItems();
   }, []);
 
-  const handleDeleteItem = async (itemId) => {
+  const handleDeleteItem = async (itemId: string) => {
     if (confirm("Are you sure you want to delete this item?")) {
       const { error } = await supabase.from("clubs").delete().eq("id", itemId); // Updated to use the `clubs` table
 
