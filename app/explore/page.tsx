@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useClubData } from "@/components/club/ClubUtils";
-import { clubData } from "@/components/club/ClubUtils";
+
 
 const categories = [
     { name: "All", icon: null },
@@ -31,6 +31,7 @@ export default function ExplorePage() {
         time: string;
         location: string;
         capacity: number;
+        image_url?: string;
     }>>([]);
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
     const clubData = useClubData();
@@ -38,7 +39,7 @@ export default function ExplorePage() {
     const fetchEvents = async (clubId: string | null = null) => {
         const { data, error } = await supabase
             .from("events")
-            .select("id, title, description, date, club_id, created_at, time, location, capacity")
+            .select("id, title, description, date, club_id, created_at, time, location, capacity, image_url")
             .eq("status", "approved");
 
         if (error) {
@@ -132,7 +133,19 @@ export default function ExplorePage() {
                     >
                         {/* Image Header */}
                         <div className="relative h-64 w-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center">
-                            <span className="text-zinc-500 dark:text-zinc-400">No Image</span>
+                            {event.image_url ? (
+                                <Image
+                                    src={event.image_url}
+                                    alt={event.title}
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                />
+                            ) : (
+                                <div className="text-zinc-500 dark:text-zinc-400 flex flex-col items-center">
+                                    <Calendar size={48} className="mb-2 opacity-50" />
+                                    <span>No Image</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Content */}

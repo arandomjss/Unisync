@@ -2,13 +2,45 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoginModal from "@/components/LoginModal";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Zap, Globe } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
+import DashboardView from "@/components/DashboardView";
 
 export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+      setLoading(false);
+    };
+
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-neon-blue"></div>
+      </div>
+    );
+  }
+
+  if (session) {
+    return <DashboardView />;
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-start overflow-x-hidden pt-20 pb-20">

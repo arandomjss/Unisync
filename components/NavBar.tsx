@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabaseClient";
 
 const roleBasedNavItems = {
   user: [
-    { name: "Home", href: "/dashboard", icon: Home },
+    { name: "Home", href: "/", icon: Home },
     { name: "Explore", href: "/explore", icon: Compass },
     { name: "Events", href: "/events", icon: Calendar },
     { name: "Profile", href: "/profile", icon: User },
