@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { Mail, Calendar, User, Search, Clock, Check, X } from "lucide-react";
+import Modal from "@/components/ui/Modal";
+import { Mail, Calendar, User, Search, Clock, Check, X, Gavel } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -27,6 +28,9 @@ export default function ClubMembers() {
     const [members, setMembers] = useState<ClubMember[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedMember, setSelectedMember] = useState<ClubMember | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
 
     const fetchMembers = async () => {
         setLoading(true);
@@ -37,6 +41,7 @@ export default function ClubMembers() {
                 router.push("/");
                 return;
             }
+            setCurrentUser(user);
 
             // 1. Get clubs where user is admin
             const { data: memberships } = await supabase
@@ -73,6 +78,34 @@ export default function ClubMembers() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleKick = async () => {
+        if (!selectedMember) return;
+
+        try {
+            const { error } = await supabase
+                .from("club_memberships")
+                .delete()
+                .eq("id", selectedMember.id);
+
+            if (error) {
+                alert("Failed to kick member. Please try again.");
+                console.error("Error kicking member:", error);
+            } else {
+                setMembers((prev) => prev.filter((m) => m.id !== selectedMember.id));
+                setIsModalOpen(false);
+                setSelectedMember(null);
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred.");
+        }
+    };
+
+    const openKickModal = (member: ClubMember) => {
+        setSelectedMember(member);
+        setIsModalOpen(true);
     };
 
     useEffect(() => {
@@ -148,11 +181,49 @@ export default function ClubMembers() {
                                             </span>
                                         </div>
                                     </div>
+                                    {currentUser && member.user_id !== currentUser.id && (
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => openKickModal(member)}
+                                            className="ml-auto bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/20"
+                                        >
+                                            <Gavel size={16} />
+                                        </Button>
+                                    )}
                                 </GlassCard>
                             </motion.div>
                         ))}
                     </div>
                 )}
+
+                <Modal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    title="Kick Member?"
+                >
+                    <div className="space-y-4">
+                        <p className="text-zinc-600 dark:text-zinc-300">
+                            Are you sure you want to kick <span className="font-bold">{selectedMember?.users.name}</span>?
+                            This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsModalOpen(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={handleKick}
+                                className="bg-red-500 hover:bg-red-600 text-white"
+                            >
+                                Kick Member
+                            </Button>
+                        </div>
+                    </div>
+                </Modal>
             </div>
         </main>
     );
