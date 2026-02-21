@@ -190,7 +190,7 @@ export default function DashboardView() {
                                 </div>
                             ) : (
                                 <>
-                                    <div className="absolute inset-0 bg-[url('/images/placeholder.jpg')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700" />
+                                    <div className="absolute inset-0 bg-[url('/images/neutral-placeholder.jpg')] bg-cover bg-center opacity-40 group-hover:scale-105 transition-transform duration-700" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                                 </>
                             )}
