@@ -110,17 +110,17 @@ export default function Home() {
             {[...Array(2)].map((_, i) => (
               <div key={i} className="flex gap-12">
                 <span>Hackathons</span> <span className="text-neon-blue">●</span>
-                <span>Parties</span> <span className="text-neon-purple">●</span>
+                <span>Seminars</span> <span className="text-neon-purple">●</span>
                 <span>Workshops</span> <span className="text-neon-pink">●</span>
-                <span>Concerts</span> <span className="text-neon-green">●</span>
+                <span>Career Fairs</span> <span className="text-neon-green">●</span>
                 <span>Esports</span> <span className="text-neon-blue">●</span>
                 <span>Networking</span> <span className="text-neon-purple">●</span>
-                <span>Hackathons</span> <span className="text-neon-blue">●</span>
-                <span>Parties</span> <span className="text-neon-purple">●</span>
-                <span>Workshops</span> <span className="text-neon-pink">●</span>
-                <span>Concerts</span> <span className="text-neon-green">●</span>
-                <span>Esports</span> <span className="text-neon-blue">●</span>
-                <span>Networking</span> <span className="text-neon-purple">●</span>
+                <span>Guest Lectures</span> <span className="text-neon-blue">●</span>
+                <span>Research Symposiums</span> <span className="text-neon-purple">●</span>
+                <span>Student Showcases</span> <span className="text-neon-pink">●</span>
+                <span>Volunteer Drives</span> <span className="text-neon-green">●</span>
+                <span>Sports Tournaments</span> <span className="text-neon-blue">●</span>
+                <span>Cultural Fests</span> <span className="text-neon-purple">●</span>
               </div>
             ))}
           </div>
