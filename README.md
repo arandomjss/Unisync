@@ -2,6 +2,10 @@
 
 Unisync is a Next.js application designed to provide a seamless user experience with modern web technologies. This project uses Tailwind CSS for styling and TypeScript for type safety.
 
+## Live Demo
+
+Check out the live application here: [Unisync Live Demo](https://unisync-bay.vercel.app/)
+
 ## Prerequisites
 
 - **Node.js**: Ensure you have Node.js installed on your system. You can download it from [Node.js](https://nodejs.org/).
@@ -39,6 +43,17 @@ Unisync is a Next.js application designed to provide a seamless user experience 
 - **app/**: Contains the main application pages and layouts.
 - **components/**: Reusable UI components.
 - **lib/**: Utility functions and data.
+
+## Features
+
+- **Real-time Updates**: Stay informed about the latest events happening on campus.
+- **Smart Matching**: Personalized event recommendations based on your interests and major.
+- **User Dashboard**: Manage your events and profile seamlessly.
+- **Responsive Design**: Optimized for all devices, ensuring a smooth user experience.
+
+## Live Demo
+
+Check out the live application here: [Unisync Live Demo](https://unisync-bay.vercel.app/)
 
 ## License
 
