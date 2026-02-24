@@ -89,13 +89,6 @@ export default function Home() {
             >
               Get Started <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
-            <Button
-              size="lg"
-              variant="neon"
-              className="rounded-full px-8 text-lg"
-            >
-              View Demo
-            </Button>
           </div>
         </motion.div>
       </section>
